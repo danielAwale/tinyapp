@@ -9,26 +9,27 @@ const urlDatabase = {
   "9sm5xk" : "https://www.google.com"
 };
 
-app.get("/", (req,res) => {
-  res.send("Hello!");
+// app.get("/", (req,res) => {
+//   res.send("Hello!");
+// });
+
+app.get('/urls', (req, res) => {
+  const templateVars = { urls: urlDatabase };
+  res.render('urls_index', templateVars);
 });
 
-app.get('/urls.json', (req, res) => {
-  res.json(urlDatabase);
-});
+// app.get('/hello', (req, res) => {
+//   res.send("<html><body>HELLO <b>World</b></body></html>\n");
+// });
 
-app.get('/hello', (req, res) => {
-  res.send("<html><body>HELLO <b>World</b></body></html>\n");
-});
-
-app.get("/set", (req, res) => {
-  const a = 1;
-  res.send(`a = ${a}`);
- });
+// app.get("/set", (req, res) => {
+//   const a = 1;
+//   res.send(`a = ${a}`);
+//  });
  
- app.get("/fetch", (req, res) => {
-  res.send(`a = ${a}`);
- });
+//  app.get("/fetch", (req, res) => {
+//   res.send(`a = ${a}`);
+//  });
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
