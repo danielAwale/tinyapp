@@ -11,6 +11,14 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
-    <form action="/login" method="POST"><input type="text" name="username"><button>Sign In</button></form>
+    <% if(username) { %>
+      <div>WELCOME TINYAPP USER
+      </div>
+      <form action="/logout" method="post"><button>logout</button></form>
+      </div>
+      <% } else { %>
+        <form action="/login" method="POST"><input type="text" name="username"><button>Sign In</button></form>
+
+        <% } %>
   </nav>
 </header>
