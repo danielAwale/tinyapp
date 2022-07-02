@@ -85,9 +85,15 @@ app.post("/login", (req, res) => {
   res.redirect("/urls");
 });
 
+//logout and get the cookie cleared
 app.post("/logout", (req, res) => {
   res.clearCookie('username');
   res.redirect("/urls");
+})
+
+//create a registration form 
+app.get("/register", (req, res) => {
+  res.render("urls_register");
 })
 
 //SERVER IS LISTENING .LISTEN!!! :)
