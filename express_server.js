@@ -33,21 +33,35 @@ const urlDatabase = {
   "9sm5xk" : "https://www.google.com"
 };
 
+//the user object
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
+
 //GETS/RENDERS THE URLS PAGE
 app.get('/urls', (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"]};
+  const templateVars = { urls: urlDatabase, user: users[req.cookies["user_id"]]};
   res.render('urls_index', templateVars);
 });
 
 //RENDERS THE URLS/NEW 
 app.get("/urls/new", (req, res) => {
-  const templateVars = {username: req.cookies["username"]};
+  const templateVars = {user: users[req.cookies["user_id"]]};
   res.render("urls_new", templateVars);
 });
 
 //not sure what this is for
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies["username"]}
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: users[req.cookies["user_id"]]}
   res.render("urls_show", templateVars);
 });
 
@@ -79,21 +93,37 @@ app.post("/urls/:id", (req, res) => {
 
 });
 
-//cookie first one
-app.post("/login", (req, res) => {
-  res.cookie("username", `${req.body.username}`);
-  res.redirect("/urls");
-});
+// //cookie first one
+// app.post("/login", (req, res) => {
+//   res.cookie("user_id", user);
+//   res.redirect("/urls");
+// });
 
 //logout and get the cookie cleared
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect("/urls");
 })
 
-//create a registration form 
+//get a registration form 
 app.get("/register", (req, res) => {
   res.render("urls_register");
+})
+
+//create a user
+app.post("/register", (req, res) => {
+  const id = generateRandomString();
+  const email = req.body.email;
+  const password = req.body.password;
+  users[id] = {
+    id,
+    email, 
+    password,
+  }
+  console.log(users);
+  res.cookie("user_id", id);
+  res.redirect("/urls");
+
 })
 
 //SERVER IS LISTENING .LISTEN!!! :)
