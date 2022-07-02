@@ -14,7 +14,7 @@
     <% if(user) { %>
       <div>WELCOME TINYAPP USER
       </div>
-      <form action="/logout" method="post"><button>logout</button></form>
+      <form action="/logout" method="POST"><button>logout</button></form>
       </div>
       <% } else { %>
         <form action="/login" method="POST"><input type="text" name="user"><button>Sign In</button></form>

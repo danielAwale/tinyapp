@@ -93,11 +93,11 @@ app.post("/urls/:id", (req, res) => {
 
 });
 
-// //cookie first one
-// app.post("/login", (req, res) => {
-//   res.cookie("user_id", user);
-//   res.redirect("/urls");
-// });
+//cookie first one
+app.post("/login", (req, res) => {
+  res.cookie("user_id", req.body.user);
+  res.redirect("/urls");
+});
 
 //logout and get the cookie cleared
 app.post("/logout", (req, res) => {
