@@ -110,21 +110,35 @@ app.get("/register", (req, res) => {
   res.render("urls_register");
 })
 
-//create a user
+//function that will take two parameters and will compare 
+const compareEmail = function(emailOnTheDatabase, emailPassed) {
+  for (let emails in emailOnTheDatabase) {
+  if(emailOnTheDatabase[emails].email === emailPassed) {
+    return true;
+  } 
+}
+}
+
+//register a user
 app.post("/register", (req, res) => {
   const id = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
+  if(!email && !password) {
+    res.status(400).send("Email and Password fields cannot be empty! Please enter an email and password to register");
+  } else if (compareEmail(users, email)){
+    res.status(400).send("This email is already in use!");
+  } else {
   users[id] = {
     id,
     email, 
     password,
-  }
-  console.log(users);
+  }}
   res.cookie("user_id", id);
   res.redirect("/urls");
 
-})
+}
+);
 
 //SERVER IS LISTENING .LISTEN!!! :)
 app.listen(PORT, () => {
