@@ -29,8 +29,14 @@ const generateRandomString = function () {
 
 //THE URLDATABASE
 const urlDatabase = {
-  "b2xVn2" : "http://www.lighthouselabs.ca",
-  "9sm5xk" : "https://www.google.com"
+  b6UTxQ: {
+        longURL: "https://www.tsn.ca",
+        userID: "aJ48lW"
+    },
+    i3BoGr: {
+        longURL: "https://www.google.ca",
+        userID: "aJ48lW"
+    }
 };
 
 //the user object
@@ -56,25 +62,35 @@ app.get('/urls', (req, res) => {
 //RENDERS THE URLS/NEW 
 app.get("/urls/new", (req, res) => {
   const templateVars = {user: users[req.cookies["user_id"]]};
-  res.render("urls_new", templateVars);
+  if (!users[req.cookies["user_id"]]) {
+    res.redirect("/login");
+  } else {
+    res.render("urls_new", templateVars);
+
+  }
 });
 
 //not sure what this is for
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: users[req.cookies["user_id"]]}
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: users[req.cookies["user_id"]]}
   res.render("urls_show", templateVars);
 });
 
 //Generating a small url for our new added long url
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL] = { longURL: req.body.longURL , userID: req.cookies[
+    "user_id"]};
   res.redirect(`/urls/${shortURL}`);
 });
 
-//NOT SURE WHAT THIS IS FOR??
+//to get to the website through the shortURL
 app.get("/u/:shortURL", (req, res) => {
-  res.redirect(urlDatabase[req.params.shortURL]);
+  if(!urlDatabase[req.params.shortURL]) {
+    res.status(404).send("This shortURL does not exist yet!")
+  } else {
+  res.redirect(urlDatabase[req.params.shortURL]["longURL"]);
+  }
 });
 
 //DELETING A SPECIFIC DATA FROM OUR URLDATABASE
@@ -88,7 +104,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
   const longURL = req.body.longURL
-  urlDatabase[id] = longURL;
+  urlDatabase[id]["longURL"] = longURL;
   res.redirect(`/urls/${id}`);
 
 });
