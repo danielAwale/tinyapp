@@ -93,11 +93,21 @@ app.post("/urls/:id", (req, res) => {
 
 });
 
-//cookie first one
+// app.post for loggin in
 app.post("/login", (req, res) => {
-  res.cookie("user_id", req.body.user);
-  res.redirect("/urls");
-});
+  const emailEntered = req.body.email;
+  const passwordEntered = req.body.password;
+  let currentUser = false;
+  if(!compareEmail(users, emailEntered)) {
+    res.status(403).send("email entered cannot be verified");
+  } else if(compareEmail(users, emailEntered) && !comparePassword(users, passwordEntered)) {
+    res.status(403).send("password entered is incorrent!");
+  } else if(compareEmail(users, emailEntered) && comparePassword(users, passwordEntered)) {
+    currentUser = true;
+  }
+    res.cookie("user_id", emailEntered);
+    res.redirect("/urls");
+})
 
 //logout and get the cookie cleared
 app.post("/logout", (req, res) => {
@@ -107,16 +117,27 @@ app.post("/logout", (req, res) => {
 
 //get a registration form 
 app.get("/register", (req, res) => {
-  res.render("urls_register");
+  templateVars = {user : users[req.cookies["user_id"]]};
+  res.render("urls_register" , templateVars);
 })
 
 //function that will take two parameters and will compare 
-const compareEmail = function(emailOnTheDatabase, emailPassed) {
-  for (let emails in emailOnTheDatabase) {
-  if(emailOnTheDatabase[emails].email === emailPassed) {
+const compareEmail = function(users, emailPassed) {
+  for (let user in users) {
+  if(users[user].email === emailPassed) {
     return true;
-  } 
-}
+  }
+  }
+  return false;
+};
+
+const comparePassword = function(users, password) {
+  for (let user in users) {
+    if(users[user].password === password) {
+      return true;
+    }
+  }
+  return false;
 }
 
 //register a user
@@ -134,11 +155,18 @@ app.post("/register", (req, res) => {
     email, 
     password,
   }}
+  console.log(users);
   res.cookie("user_id", id);
   res.redirect("/urls");
 
 }
 );
+
+//new login page get!
+app.get("/login", (req, res) => {
+  const templateVars = {user: users[req.cookies["user_id"]]};
+  res.render("urls_login", templateVars);
+})
 
 //SERVER IS LISTENING .LISTEN!!! :)
 app.listen(PORT, () => {
