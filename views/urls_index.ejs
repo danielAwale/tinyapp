@@ -31,10 +31,12 @@
               <%= urls[url] %>
             </td>
             <td>
-              <form action="urls/<%= url %>" method="GET"><button type="submit">EDIT</button></form>
+              <form action="urls/<%= url %>" method="GET"><button type="submit" class="btn btn-primary">Edit</button>
+              </form>
             </td>
             <td>
-              <form method="POST" action="/urls/<%= url %>/delete"> <button type="submit">DELETE</button>
+              <form method="POST" action="/urls/<%= url %>/delete"> <button type="submit"
+                  class="btn btn-primary">Delete</button>
               </form>
             </td>
           </tr>

@@ -97,6 +97,7 @@ app.post("/urls/:id", (req, res) => {
 app.post("/login", (req, res) => {
   const emailEntered = req.body.email;
   const passwordEntered = req.body.password;
+  const userID = findUserID(users, emailEntered);
   let currentUser = false;
   if(!compareEmail(users, emailEntered)) {
     res.status(403).send("email entered cannot be verified");
@@ -105,7 +106,7 @@ app.post("/login", (req, res) => {
   } else if(compareEmail(users, emailEntered) && comparePassword(users, passwordEntered)) {
     currentUser = true;
   }
-    res.cookie("user_id", emailEntered);
+    res.cookie("user_id", userID);
     res.redirect("/urls");
 })
 
@@ -138,6 +139,15 @@ const comparePassword = function(users, password) {
     }
   }
   return false;
+}
+
+const findUserID = function(users, emailPassed) {
+  for (let ids in users) {
+    if(users[ids].email === emailPassed) {
+      return users[ids].id
+    }
+
+  }
 }
 
 //register a user
