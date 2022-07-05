@@ -25,7 +25,8 @@ const bodyParser = require("body-parser");
 //use bodyparser!!
 app.use(bodyParser.urlencoded({extended: true}));
 
-const { generateRandomString, compareEmail, findUserID, urlsForUser, getUserByEmail } = require("./helpers")
+//HELPER FUNCTION THAT LIVE IN THE HELPERS.JS FILE AND WERE EXPORTED
+const { generateRandomString, findUserID, urlsForUser, getUserByEmail } = require("./helpers")
 
 //THE URLDATABASE
 const urlDatabase = {};
@@ -50,20 +51,20 @@ app.get("/urls/new", (req, res) => {
   }
 });
 
-//not sure what this is for
+//RENDER THE SHORT URL PAGE -- URLS_SHOW
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: users[req.session.user_id]}
   res.render("urls_show", templateVars);
 });
 
-//Generating a small url for our new added long url
+//GENERATING A SMALL URL FOR OUR NEWLY ADDED LONGURL -- THIS WILL BE DONE BY THE generateRandomString() FUNCTION
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = { longURL: req.body.longURL , userID: req.session.user_id};
   res.redirect(`/urls/${shortURL}`);
 });
 
-//to get to the website through the shortURL
+//GETTING TO THE WEBSITE THROUGH THE SHORT URL
 app.get("/u/:shortURL", (req, res) => {
   if(!urlDatabase[req.params.shortURL]) {
     res.status(404).send("This shortURL does not exist yet!")
@@ -90,12 +91,9 @@ app.post("/urls/:id", (req, res) => {
   const longURL = req.body.longURL
   urlDatabase[id]["longURL"] = longURL;
   res.redirect(`/urls/${id}`);
-
-  
-
 });
 
-// app.post for loggin in
+// FOR LOGGIN IN - USING THE POST REQUEST WE WILL LOGIN
 app.post("/login", (req, res) => {
   const emailEntered = req.body.email;
   const passwordEntered = req.body.password;
@@ -107,24 +105,23 @@ app.post("/login", (req, res) => {
     res.status(403).send("password entered is incorrent!");
   } else if(getUserByEmail(users, emailEntered) && bcrypt.compareSync(passwordEntered, users[userID].password)) {
     currentUser = true;
-  }
-    req.session.user_id = userID;
+  } req.session.user_id = userID;
     res.redirect("/urls"); 
-})
+});
 
-//logout and get the cookie cleared
+//LOGOUT WILL GET THE COOKIE THAT IS STORED IN THE DATA CLEARED
 app.post("/logout", (req, res) => {
   req.session = null;
   res.redirect("/urls");
-})
+});
 
-//get a registration form 
+// RENDER THE REGISTRATION PAGE
 app.get("/register", (req, res) => {
   templateVars = {user : users[req.session.user_id]};
   res.render("urls_register" , templateVars);
 })
 
-//register a user
+//REGISTERTING USE .POST, THIS WILL SAVE IT TO OUR URLDATABASE AND SEND A COOKIE TO THE BROWSER!
 app.post("/register", (req, res) => {
   const id = generateRandomString();
   const email = req.body.email;
@@ -145,7 +142,7 @@ app.post("/register", (req, res) => {
 } 
 );
 
-//new login page get!
+//RENDERS THE LOGIN PAGE
 app.get("/login", (req, res) => {
   const templateVars = {user: users[req.session.user_id]};
   res.render("urls_login", templateVars);
