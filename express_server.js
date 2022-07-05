@@ -5,7 +5,7 @@ const cookieParser = require("cookie-parser");
 //Initialize express
 const app = express();
 //Just a general PORT
-const PORT = 8080; 
+const PORT = 3000; 
 
 //ejs view engine
 app.set('view engine', 'ejs');
@@ -55,7 +55,7 @@ const users = {
 
 //GETS/RENDERS THE URLS PAGE
 app.get('/urls', (req, res) => {
-  const templateVars = { urls: urlDatabase, user: users[req.cookies["user_id"]]};
+  const templateVars = { urls: urlsForUser(req.cookies["user_id"]), user: users[req.cookies["user_id"]]};
   res.render('urls_index', templateVars);
 });
 
@@ -96,8 +96,14 @@ app.get("/u/:shortURL", (req, res) => {
 //DELETING A SPECIFIC DATA FROM OUR URLDATABASE
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
+  urlDatabase[shortURL] = { longURL: req.body.longURL , userID: req.cookies[
+    "user_id"]};
+  if(urlDatabase[shortURL].userID) {
   delete urlDatabase[shortURL];
   res.redirect('/urls');
+  } else {
+    res.status(404).send("You are not authorized to delete this url");
+  }
 });
 
 //EDITING THE LONG URL 
@@ -106,6 +112,8 @@ app.post("/urls/:id", (req, res) => {
   const longURL = req.body.longURL
   urlDatabase[id]["longURL"] = longURL;
   res.redirect(`/urls/${id}`);
+
+  
 
 });
 
@@ -166,6 +174,17 @@ const findUserID = function(users, emailPassed) {
   }
 }
 
+const urlsForUser = function (id) {
+  let userSpecificURL = {};
+  for (let shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userID === id) {
+      userSpecificURL[shortURL] = urlDatabase[shortURL]; 
+
+    }
+  }
+  return userSpecificURL;
+}
+
 //register a user
 app.post("/register", (req, res) => {
   const id = generateRandomString();
@@ -181,10 +200,9 @@ app.post("/register", (req, res) => {
     email, 
     password,
   }}
-  console.log(users);
+
   res.cookie("user_id", id);
   res.redirect("/urls");
-
 }
 );
 
