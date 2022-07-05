@@ -6,6 +6,8 @@ const cookieParser = require("cookie-parser");
 const app = express();
 //Just a general PORT
 const PORT = 3000; 
+// bcrypt hashing passwords
+const bcrypt = require('bcryptjs');
 
 //ejs view engine
 app.set('view engine', 'ejs');
@@ -28,30 +30,10 @@ const generateRandomString = function () {
 }
 
 //THE URLDATABASE
-const urlDatabase = {
-  b6UTxQ: {
-        longURL: "https://www.tsn.ca",
-        userID: "aJ48lW"
-    },
-    i3BoGr: {
-        longURL: "https://www.google.ca",
-        userID: "aJ48lW"
-    }
-};
+const urlDatabase = {};
 
 //the user object
-const users = { 
-  "userRandomID": {
-    id: "userRandomID", 
-    email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
-  },
- "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
-    password: "dishwasher-funk"
-  }
-}
+const users = {}
 
 //GETS/RENDERS THE URLS PAGE
 app.get('/urls', (req, res) => {
@@ -125,13 +107,13 @@ app.post("/login", (req, res) => {
   let currentUser = false;
   if(!compareEmail(users, emailEntered)) {
     res.status(403).send("email entered cannot be verified");
-  } else if(compareEmail(users, emailEntered) && !comparePassword(users, passwordEntered)) {
+  } else if(compareEmail(users, emailEntered) && !bcrypt.compareSync(passwordEntered, users[userID].password)) {
     res.status(403).send("password entered is incorrent!");
-  } else if(compareEmail(users, emailEntered) && comparePassword(users, passwordEntered)) {
+  } else if(compareEmail(users, emailEntered) && bcrypt.compareSync(passwordEntered, users[userID].password)) {
     currentUser = true;
   }
     res.cookie("user_id", userID);
-    res.redirect("/urls");
+    res.redirect("/urls"); 
 })
 
 //logout and get the cookie cleared
@@ -155,15 +137,6 @@ const compareEmail = function(users, emailPassed) {
   }
   return false;
 };
-
-const comparePassword = function(users, password) {
-  for (let user in users) {
-    if(users[user].password === password) {
-      return true;
-    }
-  }
-  return false;
-}
 
 const findUserID = function(users, emailPassed) {
   for (let ids in users) {
@@ -189,7 +162,6 @@ const urlsForUser = function (id) {
 app.post("/register", (req, res) => {
   const id = generateRandomString();
   const email = req.body.email;
-  const password = req.body.password;
   if(!email && !password) {
     res.status(400).send("Email and Password fields cannot be empty! Please enter an email and password to register");
   } else if (compareEmail(users, email)){
@@ -198,9 +170,9 @@ app.post("/register", (req, res) => {
   users[id] = {
     id,
     email, 
-    password,
+    password: bcrypt.hashSync(req.body.password, 10),
   }}
-
+  console.log(users);
   res.cookie("user_id", id);
   res.redirect("/urls");
 }
