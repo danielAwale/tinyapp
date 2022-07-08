@@ -53,15 +53,23 @@ app.get("/urls/new", (req, res) => {
 
 //RENDER THE SHORT URL PAGE -- URLS_SHOW
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: users[req.session.user_id]}
+  const shortURL = req.params.shortURL;
+  if (urlDatabase[shortURL] && urlDatabase[shortURL].userID === req.session.user_id) {
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: users[req.session.user_id] }
   res.render("urls_show", templateVars);
+  } else {
+    res.status(404).send("You are not authorized to edit this url");
+  }  
+  return
 });
+  
 
 //GENERATING A SMALL URL FOR OUR NEWLY ADDED LONGURL -- THIS WILL BE DONE BY THE generateRandomString() FUNCTION
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = { longURL: req.body.longURL , userID: req.session.user_id};
   res.redirect(`/urls/${shortURL}`);
+  console.log(urlDatabase);
 });
 
 //GETTING TO THE WEBSITE THROUGH THE SHORT URL
@@ -88,10 +96,16 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 //EDITING THE LONG URL 
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
+  console.log(id, req.session.user_id);
+  if (urlDatabase[id]["userID"] === req.session.user_id) {
   const longURL = req.body.longURL
   urlDatabase[id]["longURL"] = longURL;
   res.redirect(`/urls/${id}`);
+  } else {
+    res.status(404).send("You are not authorized to edit this url");
+  }  
 });
+
 
 // FOR LOGGIN IN - USING THE POST REQUEST WE WILL LOGIN
 app.post("/login", (req, res) => {
@@ -126,7 +140,7 @@ app.post("/register", (req, res) => {
   const id = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
-  if(!email && !password) {
+  if(!email || !password) {
     res.status(400).send("Email and Password fields cannot be empty! Please enter an email and password to register");
   } else if (getUserByEmail(users, email)){
     res.status(400).send("This email is already in use!");
@@ -135,10 +149,10 @@ app.post("/register", (req, res) => {
     id,
     email, 
     password: bcrypt.hashSync(password, 10),
-  }}
-  console.log(users);
+  }} 
   req.session.user_id = id;
   res.redirect("/urls");
+  console.log(users)
 } 
 );
 
@@ -152,4 +166,5 @@ app.get("/login", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+     
 
