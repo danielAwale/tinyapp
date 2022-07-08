@@ -34,6 +34,11 @@ const urlDatabase = {};
 //the user object
 const users = {}
 
+app.get('/', (req,res) => {
+  const templateVars = { urls: urlsForUser(req.session.user_id, urlDatabase), user: users[req.session.user_id]};
+  res.render('urls_index', templateVars);
+});
+
 //GETS/RENDERS THE URLS PAGE
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlsForUser(req.session.user_id, urlDatabase), user: users[req.session.user_id]};
@@ -88,7 +93,7 @@ app.get("/u/:shortURL", (req, res) => {
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
   urlDatabase[shortURL] = { longURL: req.body.longURL , userID: req.session.user_id};
-  if(urlDatabase[shortURL].userID) {
+  if(urlDatabase[shortURL].userID === req.session.user_id) {
   delete urlDatabase[shortURL];
   res.redirect('/urls');
   } else {
@@ -99,8 +104,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 //EDITING THE LONG URL 
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
-  console.log(id, req.session.user_id);
-  if (urlDatabase[id]["userID"] === req.session.user_id) {
+  if (urlDatabase[id] && urlDatabase[id]["userID"] === req.session.user_id) {
   const longURL = req.body.longURL
   urlDatabase[id]["longURL"] = longURL;
   res.redirect(`/urls/${id}`);
@@ -170,6 +174,8 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
      
+
+
 
 
 
