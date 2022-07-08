@@ -62,14 +62,17 @@ app.get("/urls/:shortURL", (req, res) => {
   }  
   return
 });
-  
+
 
 //GENERATING A SMALL URL FOR OUR NEWLY ADDED LONGURL -- THIS WILL BE DONE BY THE generateRandomString() FUNCTION
 app.post("/urls", (req, res) => {
+  if(req.session.user_id) {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = { longURL: req.body.longURL , userID: req.session.user_id};
   res.redirect(`/urls/${shortURL}`);
-  console.log(urlDatabase);
+  } else {
+  res.status(404).send("you need to register or login to use this service!")
+  }
 });
 
 //GETTING TO THE WEBSITE THROUGH THE SHORT URL
@@ -167,4 +170,7 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
      
+
+
+
 
