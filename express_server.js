@@ -93,7 +93,7 @@ app.get("/login", (req, res) => {
 //GENERATING A SMALL URL FOR LONGURL
 app.post("/urls", (req, res) => {
   if (req.session.user_id) {
-    const shortURL = generateRandomString();
+    const shortURL = generateRandomString(6);
     urlDatabase[shortURL] = { longURL: req.body.longURL , userID: req.session.user_id};
     res.redirect(`/urls/${shortURL}`);
   } else {
@@ -101,7 +101,7 @@ app.post("/urls", (req, res) => {
   }
 });
 
-//DELETING DATA FROM OUR URLDATABASE
+//DELETING DATA FROM URLDATABASE
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
   urlDatabase[shortURL] = { longURL: req.body.longURL , userID: req.session.user_id};
@@ -140,7 +140,7 @@ app.post("/login", (req, res) => {
   res.redirect("/urls");
 });
 
-//LOGOUT WILL GET THE COOKIE THAT IS STORED IN THE DATA CLEARED
+//LOGOUT
 app.post("/logout", (req, res) => {
   req.session = null;
   res.redirect("/urls");
@@ -148,7 +148,7 @@ app.post("/logout", (req, res) => {
 
 //REGISTERING USER
 app.post("/register", (req, res) => {
-  const id = generateRandomString();
+  const id = generateRandomString(6);
   const email = req.body.email;
   const password = req.body.password;
   if (!email || !password) {

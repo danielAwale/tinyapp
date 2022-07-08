@@ -1,7 +1,7 @@
 {
   "name": "tinyapp",
   "version": "1.0.0",
-  "description": "",
+  "description": "An url shortening app! ",
   "main": "index.js",
   "scripts": {
     "start": "./node_modules/.bin/nodemon -L express_server.js",
@@ -12,7 +12,7 @@
     "url": "git+https://github.com/danielAwale/tinyapp.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Daniel Awale",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/danielAwale/tinyapp/issues"

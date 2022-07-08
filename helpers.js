@@ -1,8 +1,8 @@
 //function that generates a random string
-const generateRandomString = function() {
+const generateRandomString = function(length) {
   let randomString = '';
   const allCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < length; i++) {
     randomString += allCharacters.charAt(Math.floor(Math.random() * allCharacters.length));
   }
   return randomString;
@@ -24,7 +24,6 @@ const findUserID = function(users, emailPassed) {
     if (users[ids].email === emailPassed) {
       return users[ids].id;
     }
-
   }
 };
 
@@ -34,7 +33,6 @@ const urlsForUser = function(id, urlDatabase) {
   for (let shortURL in urlDatabase) {
     if (urlDatabase[shortURL].userID === id) {
       userSpecificURL[shortURL] = urlDatabase[shortURL];
-
     }
   }
   return userSpecificURL;
